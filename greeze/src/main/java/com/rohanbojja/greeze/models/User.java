@@ -23,8 +23,7 @@ public class User {
         this.applications = applications;
     }
 
-    public User(String id, String displayName, String emailId, String photoURL) {
-        this.id = id;
+    public User(String displayName, String emailId, String photoURL) {
         this.displayName = displayName;
         this.emailId = emailId;
         this.photoURL = photoURL;

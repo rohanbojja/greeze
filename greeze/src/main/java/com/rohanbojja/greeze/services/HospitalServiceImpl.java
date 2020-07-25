@@ -27,12 +27,11 @@ public class HospitalServiceImpl implements HospitalService {
         return hospitalRepository.findById(id);
     }
 
-    @Override
     public Hospital updateHospitalDetails(Hospital hospital) {
-        return null;
+        return hospitalRepository.save(hospital);
     }
 
-    @Override
+    //To be implemented
     public List<Hospital> getHospitalsNearby(String geohash) {
         return null;
     }
@@ -61,13 +60,33 @@ public class HospitalServiceImpl implements HospitalService {
         return null;
     }
 
-    @Override
     public void rejectApplication(Long hospitalId, Long applicationId) {
-
+        hospitalRepository.findById(hospitalId).map(
+                hospital -> {
+                    List<Long> applicationIds = hospital.getApplications();
+                    applicationIds.remove(applicationId);
+                    hospital.setApplications(applicationIds);
+                    hospitalRepository.save(hospital);
+                    return null;
+                }
+        );
+        testApplicationRepository.findById(applicationId).map(
+                testApplication -> {
+                    testApplication.setStatus(2);
+                    testApplicationRepository.save(testApplication);
+                    return null;
+                }
+        );
     }
 
     @Override
     public Optional<TestApplication> acceptApplication(Long hospitalId, Long applicationId, Long scheduledMSE) {
-        return Optional.empty();
+        return testApplicationRepository.findById(applicationId).map(
+                testApplication -> {
+                    testApplication.setStatus(1);
+                    testApplication.setScheduledMSE(scheduledMSE);
+                    return testApplicationRepository.save(testApplication);
+                }
+        );
     }
 }

@@ -4,6 +4,7 @@ import com.rohanbojja.greeze.models.Hospital;
 import com.rohanbojja.greeze.models.TestApplication;
 import com.rohanbojja.greeze.models.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -17,13 +18,13 @@ public interface UserService {
 
     Optional<Iterable<TestApplication>> getUserApplications(String uid);
 
-    Optional<Iterable<TestApplication>> getRejectedUserApplications(String uid);
+    List<TestApplication> getRejectedUserApplications(String uid);
 
-    Optional<Iterable<TestApplication>> getScheduledUserApplications(String uid);
+    List<TestApplication> getScheduledUserApplications(String uid);
 
-    Optional<Iterable<TestApplication>> getPreviousUserApplications(String uid);
+    List<TestApplication> getPreviousUserApplications(String uid);
 
-    Optional<Iterable<TestApplication>> getPendingUserApplications(String uid);
+    List<TestApplication> getPendingUserApplications(String uid);
 
     void deleteUserApplication(String uid, Long applicationId);
 

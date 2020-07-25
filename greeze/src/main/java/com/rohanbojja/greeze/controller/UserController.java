@@ -1,5 +1,8 @@
 package com.rohanbojja.greeze.controller;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.rohanbojja.greeze.models.TestApplication;
 import com.rohanbojja.greeze.models.User;
 import com.rohanbojja.greeze.services.UserService;
@@ -16,43 +19,99 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/user")
-    public ResponseEntity<User> createUser(@RequestBody final User user){
+    public ResponseEntity<User> createUser(@RequestBody final User user, @RequestHeader("auth_token") String idToken){
         //Call only once
-        return ResponseEntity.ok()
-                .body(userService.createUser(user));
+        try {
+            System.out.println(FirebaseAuth.getInstance().getUser("WlDhRMGglJWUBExE2TOGjjKLSu22").getEmail());
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+        }
+//        FirebaseToken decodedToken;
+//        try {
+//            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+//            String uid = decodedToken.getUid();
+//            user.setId(uid);
+//            return ResponseEntity.ok()
+//                    .body(userService.createUser(user));
+//        } catch (FirebaseAuthException e) {
+//            e.printStackTrace();
+//            return ResponseEntity.badRequest().build();
+//        }
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<Iterable<User>> getAllUsers(){
-        return ResponseEntity.ok()
-                .body(userService.getAllUsers());
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserDetails(@RequestHeader("auth_token") String idToken){
+        FirebaseToken decodedToken;
+        try {
+            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+            return userService.getUserDetails(uid).map(
+                    user -> ResponseEntity.ok()
+                            .body(user)
+            ).orElse(ResponseEntity.notFound().build());
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserDetails(@PathVariable String id){
-        return userService.getUserDetails(id).map(
-                user -> ResponseEntity.ok()
-                        .body(user)
-        ).orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/user/{id}/{hospitalId}")
+    @PostMapping("/user/apply/{hospitalId}")
     @ApiModelProperty(value = "Create a Covid-19 test application to the hospital specified by the hospital ID.")
-    public ResponseEntity<TestApplication> applyForTest(@PathVariable Long hospitalId, @PathVariable String id){
-        return userService.applyForTest(id,hospitalId).map(
-                user -> ResponseEntity.ok().body(user)
-        ).orElse(ResponseEntity.badRequest().build());
+    public ResponseEntity<TestApplication> applyForTest(@PathVariable Long hospitalId, @RequestHeader("auth_token") String idToken){
+        FirebaseToken decodedToken;
+        try {
+            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+            return userService.applyForTest(uid,hospitalId).map(
+                    user -> ResponseEntity.ok().body(user)
+            ).orElse(ResponseEntity.notFound().build());
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @GetMapping("/user/{id}/applications")
-    public ResponseEntity<Iterable<TestApplication>> getUserApplications(@PathVariable final String uid){
-        return userService.getUserApplications(uid).map(
-                hospitals -> ResponseEntity.ok().body(hospitals)
-        ).orElse(ResponseEntity.badRequest().build());
+    @GetMapping("/user/applications")
+    public ResponseEntity<Iterable<TestApplication>> getUserApplications(@RequestHeader("auth_token") String idToken){
+        FirebaseToken decodedToken;
+        try {
+            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+            return userService.getUserApplications(uid).map(
+                    hospitals -> ResponseEntity.ok().body(hospitals)
+            ).orElse(ResponseEntity.badRequest().build());
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<Boolean> deleteUser(@PathVariable String id){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    @DeleteMapping("/user")
+    public ResponseEntity<Boolean> deleteUser(@RequestHeader("auth_token") String idToken){
+        FirebaseToken decodedToken;
+        try {
+            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+            userService.deleteUser(uid);
+            return ResponseEntity.ok().build();
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("user/applications/{applicationId}")
+    public ResponseEntity<?> deleteUserApplication(@PathVariable final Long applicationId, @RequestHeader("auth_token") String idToken){
+        FirebaseToken decodedToken;
+        try {
+            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+            userService.deleteUserApplication(uid,applicationId);
+            return ResponseEntity.ok().build();
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
