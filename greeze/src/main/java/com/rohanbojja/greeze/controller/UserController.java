@@ -21,23 +21,17 @@ public class UserController {
     @PostMapping("/user")
     public ResponseEntity<User> createUser(@RequestBody final User user, @RequestHeader("auth_token") String idToken){
         //Call only once
+        FirebaseToken decodedToken;
         try {
-            System.out.println(FirebaseAuth.getInstance().getUser("WlDhRMGglJWUBExE2TOGjjKLSu22").getEmail());
+            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            String uid = decodedToken.getUid();
+            user.setId(uid);
+            return ResponseEntity.ok()
+                    .body(userService.createUser(user));
         } catch (FirebaseAuthException e) {
             e.printStackTrace();
+            return ResponseEntity.badRequest().build();
         }
-//        FirebaseToken decodedToken;
-//        try {
-//            decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
-//            String uid = decodedToken.getUid();
-//            user.setId(uid);
-//            return ResponseEntity.ok()
-//                    .body(userService.createUser(user));
-//        } catch (FirebaseAuthException e) {
-//            e.printStackTrace();
-//            return ResponseEntity.badRequest().build();
-//        }
-        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/user")

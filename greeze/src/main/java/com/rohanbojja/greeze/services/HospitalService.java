@@ -8,10 +8,8 @@ import java.util.Optional;
 
 public interface HospitalService {
     Hospital createHospital(Hospital hospital);
-    Optional<Hospital> getHospitalDetails(Long id);
     Hospital updateHospitalDetails(Hospital hospital);
     List<Hospital> getHospitalsNearby(String geohash);
-    Iterable<Hospital> getAllHospitals();
     Iterable<TestApplication> getPendingTestApplications(Long hospitalId);
     Iterable<TestApplication> getScheduledApplications(Long hospitalId);
     Iterable<TestApplication> getPreviousApplications(Long hospitalId);
