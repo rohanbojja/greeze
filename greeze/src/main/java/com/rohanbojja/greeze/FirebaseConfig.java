@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Primary;
 import java.io.IOException;
 @Configuration
 public class FirebaseConfig {
-    @Primary
     @Bean
     public void firebaseInit() throws IOException{
         FirebaseOptions options;

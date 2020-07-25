@@ -135,19 +135,17 @@ public class UserServiceImpl implements UserService {
     public Optional<TestApplication> applyForTest(String uid, Long hospitalId) {
         return userRepository.findById(uid).map(
                 user -> {
-                    TestApplication testApplication = testApplicationRepository.save(new TestApplication(0, user.getId(), hospitalId));
-                    Long testApplicationId = testApplication.getApplicationId();
-                    user.addToApplicationList(testApplicationId);
-                    userRepository.save(user);
                     hospitalRepository.findById(hospitalId).map(
-                            hospital1 -> {
-                                hospital1.addToApplicationList(testApplicationId);
-                                hospitalRepository.save(hospital1);
+                            hospital -> {
+                                TestApplication testApplication = testApplicationRepository.save(new TestApplication(0, user.getId(), hospitalId, user.getDisplayName(), hospital.getName()));
+                                Long testApplicationId = testApplication.getApplicationId();
+                                user.addToApplicationList(testApplicationId);
+                                userRepository.save(user);
+                                hospital.addToApplicationList(testApplicationId);
+                                hospitalRepository.save(hospital);
                                 return null;
-                            }
-                    );
-                    return testApplication;
-                }
-        );
+                            });
+                    return null;
+                });
     }
 }

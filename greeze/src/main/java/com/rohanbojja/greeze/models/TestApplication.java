@@ -13,13 +13,19 @@ public class TestApplication {
     Long hospitalId;
     Long createdMSE;
     Long scheduledMSE;
+    String userDisplayName;
+    String hospitalName;
 
-    public TestApplication(Integer status, String uid, Long hospitalId) {
+    public TestApplication(Integer status, String uid, Long hospitalId, String userDisplayName, String hospitalName) {
         this.status = status;
         this.uid = uid;
         this.hospitalId = hospitalId;
         this.createdMSE = System.currentTimeMillis();
+        this.userDisplayName  = userDisplayName;
+        this.hospitalName = hospitalName;
     }
+
+
 
     public Long getApplicationId() {
         return applicationId;
@@ -67,5 +73,21 @@ public class TestApplication {
 
     public void setScheduledMSE(Long scheduledMSE) {
         this.scheduledMSE = scheduledMSE;
+    }
+
+    public String getUserDisplayName() {
+        return userDisplayName;
+    }
+
+    public void setUserDisplayName(String userDisplayName) {
+        this.userDisplayName = userDisplayName;
+    }
+
+    public String getHospitalName() {
+        return hospitalName;
+    }
+
+    public void setHospitalName(String hospitalName) {
+        this.hospitalName = hospitalName;
     }
 }
